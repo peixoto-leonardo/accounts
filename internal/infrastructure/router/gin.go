@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/peixoto-leonardo/accounts/internal/domain"
 	ap "github.com/peixoto-leonardo/accounts/internal/infrastructure/account/api"
 	"github.com/peixoto-leonardo/accounts/internal/infrastructure/account/di"
 	"github.com/peixoto-leonardo/accounts/internal/infrastructure/postgres"
@@ -60,6 +61,11 @@ func (g *ginEngine) buildGetAccountHandler() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 		r, err := api.Get(ctx.Request.Context(), ctx.Param("account_id"))
+
+		if err == domain.ErrAccountNotFound {
+			response.NewError(err, http.StatusNotFound).Send(ctx.Writer)
+			return
+		}
 
 		if err != nil {
 			response.NewError(err, http.StatusInternalServerError).Send(ctx.Writer)
