@@ -27,7 +27,7 @@ func (r repository) FindByID(ctx context.Context, accountID string) (*domain.Acc
 			FROM 
 				accounts
 			WHERE
-				id = $1 FOR NO KEY UPDATE
+				id = $1 and deleted_at IS NULL FOR NO KEY UPDATE
 		`
 		id        string
 		name      string
