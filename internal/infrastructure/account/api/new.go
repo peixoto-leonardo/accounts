@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/peixoto-leonardo/accounts/internal/infrastructure/account/models"
 	"github.com/peixoto-leonardo/accounts/internal/infrastructure/validator"
 	usecase "github.com/peixoto-leonardo/accounts/internal/usecases/account"
 )
@@ -17,6 +18,7 @@ type (
 	Interface interface {
 		Create(http.ResponseWriter, *http.Request)
 		Delete(context.Context, string) error
+		Get(context.Context, string) (models.AccountResponse, error)
 	}
 )
 

@@ -2,13 +2,20 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"time"
+)
+
+var (
+	ErrAccountNotFound = errors.New("account not found")
 )
 
 type (
 	AccountRepository interface {
 		Create(context.Context, *Account) (*Account, error)
 		Delete(context.Context, string) error
+		FindByID(ctx context.Context, accountID string) (*Account, error)
+		WithTransaction(context.Context, func(context.Context) error) error
 	}
 
 	Account struct {

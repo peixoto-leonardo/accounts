@@ -9,8 +9,8 @@ type handler struct {
 	db *sql.DB
 }
 
-func (p handler) ExecuteContext(ctx context.Context, query string, args ...interface{}) error {
-	_, err := p.db.ExecContext(ctx, query, args...)
+func (h handler) ExecuteContext(ctx context.Context, query string, args ...interface{}) error {
+	_, err := h.db.ExecContext(ctx, query, args...)
 
 	if err != nil {
 		return err
@@ -19,11 +19,17 @@ func (p handler) ExecuteContext(ctx context.Context, query string, args ...inter
 	return nil
 }
 
-func (p handler) BeginTx(ctx context.Context) (Tx, error) {
-	tx, err := p.db.BeginTx(ctx, &sql.TxOptions{})
+func (h handler) QueryRowContext(ctx context.Context, query string, args ...interface{}) Row {
+	row := h.db.QueryRowContext(ctx, query, args...)
+
+	return newRowHandler(row)
+}
+
+func (h handler) BeginTx(ctx context.Context) (Tx, error) {
+	tx, err := h.db.BeginTx(ctx, &sql.TxOptions{})
 
 	if err != nil {
-		return handler{}, err
+		return txHandler{}, err
 	}
 
 	return newTxHandler(tx), nil

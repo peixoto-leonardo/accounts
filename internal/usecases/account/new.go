@@ -17,9 +17,18 @@ type (
 		Id string
 	}
 
+	AccountOutput struct {
+		Id        string
+		Name      string
+		CPF       string
+		Balance   float64
+		CreatedAt string
+	}
+
 	AccountUseCase interface {
 		Create(context.Context, CreateAccountInput) (CreateAccountOutput, error)
 		Delete(context.Context, string) error
+		Get(context.Context, string) (AccountOutput, error)
 	}
 
 	usecase struct {

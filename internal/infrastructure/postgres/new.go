@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/peixoto-leonardo/accounts/internal/infrastructure/logger"
 	_ "github.com/lib/pq"
+	"github.com/peixoto-leonardo/accounts/internal/infrastructure/logger"
 )
 
 var log = logger.WithPrefix(context.TODO(), "database")
@@ -27,4 +27,8 @@ func New() (SQL, error) {
 
 func newTxHandler(tx *sql.Tx) Tx {
 	return &txHandler{tx}
+}
+
+func newRowHandler(row *sql.Row) Row {
+	return &rowHandler{row}
 }

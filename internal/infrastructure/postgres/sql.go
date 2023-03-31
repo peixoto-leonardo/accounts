@@ -9,4 +9,11 @@ type SQL interface {
 
 type Tx interface {
 	ExecuteContext(context.Context, string, ...interface{}) error
+	QueryRowContext(context.Context, string, ...interface{}) Row
+	Commit() error
+	Rollback() error
+}
+
+type Row interface {
+	Scan(dest ...interface{}) error
 }
