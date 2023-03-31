@@ -8,6 +8,7 @@ import (
 type (
 	AccountRepository interface {
 		Create(context.Context, *Account) (*Account, error)
+		Delete(context.Context, string) error
 	}
 
 	Account struct {

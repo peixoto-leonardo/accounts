@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/peixoto-leonardo/accounts/internal/infrastructure/validator"
@@ -15,6 +16,7 @@ type (
 
 	Interface interface {
 		Create(http.ResponseWriter, *http.Request)
+		Delete(context.Context, string) error
 	}
 )
 
@@ -26,9 +28,7 @@ func (a *api) validate(request interface{}) (msgs []string) {
 	err := a.validator.Validate(request)
 
 	if err != nil {
-		for _, msg := range a.validator.Messages() {
-			msgs = append(msgs, msg)
-		}
+		msgs = append(msgs, a.validator.Messages()...)
 	}
 
 	return

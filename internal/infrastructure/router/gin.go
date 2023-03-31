@@ -8,6 +8,7 @@ import (
 	"github.com/peixoto-leonardo/accounts/internal/infrastructure/account/di"
 	"github.com/peixoto-leonardo/accounts/internal/infrastructure/postgres"
 	"github.com/peixoto-leonardo/accounts/internal/infrastructure/validator"
+	"github.com/peixoto-leonardo/accounts/pkg/utils/response"
 )
 
 type ginEngine struct {
@@ -29,6 +30,7 @@ func (g *ginEngine) GetHandler() http.Handler {
 
 func (g *ginEngine) configHandlers() {
 	g.router.POST("/v1/accounts", g.buildCreateAccountHandler())
+	g.router.DELETE("/v1/accounts/:account_id", g.buildDeleteAccountHandler())
 }
 
 func (g *ginEngine) buildCreateAccountHandler() gin.HandlerFunc {
@@ -36,5 +38,18 @@ func (g *ginEngine) buildCreateAccountHandler() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 		api.Create(ctx.Writer, ctx.Request)
+	}
+}
+
+func (g *ginEngine) buildDeleteAccountHandler() gin.HandlerFunc {
+	api := ap.New(di.GetCreateAccountUseCase(g.db), validator.New())
+
+	return func(ctx *gin.Context) {
+		if err := api.Delete(ctx.Request.Context(), ctx.Param("account_id")); err != nil {
+			response.NewError(err, http.StatusInternalServerError).Send(ctx.Writer)
+			return
+		}
+
+		response.NewSuccess(nil, http.StatusNoContent).Send(ctx.Writer)
 	}
 }

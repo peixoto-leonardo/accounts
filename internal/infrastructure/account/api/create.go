@@ -11,13 +11,13 @@ import (
 	"github.com/peixoto-leonardo/accounts/pkg/utils/response"
 )
 
-var log = logger.WithPrefix(context.TODO(), "create-account")
+var logCreateAccount = logger.WithPrefix(context.TODO(), "create-account")
 
 func (a *api) Create(w http.ResponseWriter, r *http.Request) {
 	var request models.CreateAccountRequest
 
 	if err := json.ParserBody(r.Body, &request); err != nil {
-		log.WithError(err).Error("error when decoding json")
+		logCreateAccount.WithError(err).Error("error when decoding json")
 
 		response.NewError(err, http.StatusBadRequest).Send(w)
 
@@ -25,7 +25,7 @@ func (a *api) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if errs := a.validate(request); len(errs) > 0 {
-		log.WithField("errors", errs).Error("invalid input")
+		logCreateAccount.WithField("errors", errs).Error("invalid input")
 
 		response.NewErrorMessage(errs, http.StatusBadRequest).Send(w)
 
@@ -35,7 +35,7 @@ func (a *api) Create(w http.ResponseWriter, r *http.Request) {
 	output, err := a.usecase.Create(r.Context(), account.CreateAccountInput(request))
 
 	if err != nil {
-		log.WithError(err).Error("error when creating a new account")
+		logCreateAccount.WithError(err).Error("error when creating a new account")
 
 		response.NewError(err, http.StatusInternalServerError).Send(w)
 

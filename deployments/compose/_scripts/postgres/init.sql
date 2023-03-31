@@ -1,0 +1,11 @@
+GRANT ALL PRIVILEGES ON DATABASE bank TO dev;
+
+
+CREATE TABLE accounts (
+    id VARCHAR(36) PRIMARY KEY NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    cpf CHAR(11) UNIQUE NOT NULL,
+    balance BIGINT NOT NULL,
+    deleted_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL
+);

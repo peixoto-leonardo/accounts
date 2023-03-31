@@ -15,7 +15,7 @@ import (
 var log = logger.WithPrefix(context.TODO(), "main")
 
 func main() {
-	conn, err := postgres.NewConnection()
+	conn, err := postgres.New()
 	if err != nil {
 		log.WithError(err).Fatal("cannot connect to the database")
 	}

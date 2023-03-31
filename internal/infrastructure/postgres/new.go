@@ -4,17 +4,13 @@ import (
 	"context"
 	"database/sql"
 
-	_ "github.com/lib/pq"
 	"github.com/peixoto-leonardo/accounts/internal/infrastructure/logger"
+	_ "github.com/lib/pq"
 )
-
-type handler struct {
-	db *sql.DB
-}
 
 var log = logger.WithPrefix(context.TODO(), "database")
 
-func NewConnection() (*handler, error) {
+func New() (SQL, error) {
 	config := NewConfig()
 	db, err := sql.Open(config.driver, config.GetUrl())
 
@@ -29,12 +25,6 @@ func NewConnection() (*handler, error) {
 	return &handler{db}, nil
 }
 
-func (p handler) ExecuteContext(ctx context.Context, query string, args ...interface{}) error {
-	_, err := p.db.ExecContext(ctx, query, args...)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+func newTxHandler(tx *sql.Tx) Tx {
+	return &txHandler{tx}
 }

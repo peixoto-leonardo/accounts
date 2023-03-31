@@ -19,6 +19,7 @@ type (
 
 	AccountUseCase interface {
 		Create(context.Context, CreateAccountInput) (CreateAccountOutput, error)
+		Delete(context.Context, string) error
 	}
 
 	usecase struct {
