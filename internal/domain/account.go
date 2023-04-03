@@ -14,6 +14,7 @@ type (
 	AccountRepository interface {
 		Create(context.Context, *Account) (*Account, error)
 		Delete(context.Context, string) error
+		Deposit(context.Context, string, float64) error
 		FindByID(ctx context.Context, accountID string) (*Account, error)
 		WithTransaction(context.Context, func(context.Context) error) error
 	}
@@ -68,4 +69,8 @@ func (a *Account) GetCreatedAt() time.Time {
 
 func (a *Account) GetBalance() float64 {
 	return a.balance
+}
+
+func (a *Account) Deposit(amount float64) {
+	a.balance += amount
 }

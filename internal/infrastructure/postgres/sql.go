@@ -2,18 +2,24 @@ package postgres
 
 import "context"
 
-type SQL interface {
-	ExecuteContext(context.Context, string, ...interface{}) error
-	BeginTx(context.Context) (Tx, error)
-}
+type (
+	Result struct {
+		RowsAffected int64
+	}
 
-type Tx interface {
-	ExecuteContext(context.Context, string, ...interface{}) error
-	QueryRowContext(context.Context, string, ...interface{}) Row
-	Commit() error
-	Rollback() error
-}
+	SQL interface {
+		ExecuteContext(context.Context, string, ...interface{}) error
+		BeginTx(context.Context) (Tx, error)
+	}
 
-type Row interface {
-	Scan(dest ...interface{}) error
-}
+	Tx interface {
+		ExecuteContext(context.Context, string, ...interface{}) (Result, error)
+		QueryRowContext(context.Context, string, ...interface{}) Row
+		Commit() error
+		Rollback() error
+	}
+
+	Row interface {
+		Scan(dest ...interface{}) error
+	}
+)

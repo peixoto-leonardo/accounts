@@ -19,6 +19,7 @@ type (
 		Create(http.ResponseWriter, *http.Request)
 		Delete(context.Context, string) error
 		Get(context.Context, string) (models.AccountResponse, error)
+		Deposit(context.Context, string, float64) error
 	}
 )
 

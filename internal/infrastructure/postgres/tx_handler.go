@@ -5,16 +5,22 @@ import (
 	"database/sql"
 )
 
-type txHandler struct {
-	tx *sql.Tx
-}
+type (
+	txHandler struct {
+		tx *sql.Tx
+	}
+)
 
-func (t txHandler) ExecuteContext(ctx context.Context, query string, args ...interface{}) error {
-	if _, err := t.tx.ExecContext(ctx, query, args...); err != nil {
-		return err
+func (t txHandler) ExecuteContext(ctx context.Context, query string, args ...interface{}) (Result, error) {
+	result, err := t.tx.ExecContext(ctx, query, args...)
+	if err != nil {
+		return Result{}, err
 	}
 
-	return nil
+	rows, _ := result.RowsAffected()
+
+	return Result{rows}, nil
+
 }
 
 func (t txHandler) QueryRowContext(ctx context.Context, query string, args ...interface{}) Row {

@@ -29,6 +29,7 @@ type (
 		Create(context.Context, CreateAccountInput) (CreateAccountOutput, error)
 		Delete(context.Context, string) error
 		Get(context.Context, string) (AccountOutput, error)
+		Deposit(context.Context, string, float64) error
 	}
 
 	usecase struct {

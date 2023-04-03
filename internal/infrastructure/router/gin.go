@@ -33,6 +33,7 @@ func (g *ginEngine) configHandlers() {
 	g.router.POST("/v1/accounts", g.buildCreateAccountHandler())
 	g.router.DELETE("/v1/accounts/:account_id", g.buildDeleteAccountHandler())
 	g.router.GET("/v1/accounts/:account_id", g.buildGetAccountHandler())
+	g.router.PATCH("/v1/accounts/:account_id", g.buildDepositInAccountHandler())
 }
 
 func (g *ginEngine) buildCreateAccountHandler() gin.HandlerFunc {
@@ -73,5 +74,20 @@ func (g *ginEngine) buildGetAccountHandler() gin.HandlerFunc {
 		}
 
 		response.NewSuccess(r, http.StatusOK).Send(ctx.Writer)
+	}
+}
+
+func (g *ginEngine) buildDepositInAccountHandler() gin.HandlerFunc {
+	api := ap.New(di.GetCreateAccountUseCase(g.db), validator.New())
+
+	return func(ctx *gin.Context) {
+		err := api.Deposit(ctx.Request.Context(), ctx.Param("account_id"), 100.0)
+
+		if err != nil {
+			response.NewError(err, http.StatusInternalServerError).Send(ctx.Writer)
+			return
+		}
+
+		response.NewSuccess(nil, http.StatusNoContent).Send(ctx.Writer)
 	}
 }

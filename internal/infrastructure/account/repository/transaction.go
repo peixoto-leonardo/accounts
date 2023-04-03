@@ -6,6 +6,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+type ctxKey string
+
+const contextKey ctxKey = "TransactionContextKey"
+
 func (r repository) WithTransaction(ctx context.Context, fn func(ctxTx context.Context) error) error {
 	tx, err := r.db.BeginTx(ctx)
 
@@ -13,7 +17,7 @@ func (r repository) WithTransaction(ctx context.Context, fn func(ctxTx context.C
 		return errors.Wrap(err, "error begin tx")
 	}
 
-	ctxTx := context.WithValue(ctx, "TransactionContextKey", tx)
+	ctxTx := context.WithValue(ctx, contextKey, tx)
 
 	err = fn(ctxTx)
 	if err != nil {
