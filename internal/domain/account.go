@@ -7,15 +7,15 @@ import (
 )
 
 var (
-	ErrAccountNotFound = errors.New("account not found")
+	ErrAccountNotFound     = errors.New("account not found")
+	ErrInsufficientBalance = errors.New("origin account does not have sufficient balance")
 )
 
 type (
 	AccountRepository interface {
 		Create(context.Context, *Account) (*Account, error)
 		Delete(context.Context, string) error
-		Deposit(context.Context, string, float64) error
-		Withdraw(context.Context, string, float64) error
+		UpdateBalance(context.Context, string, float64) error
 		FindByID(ctx context.Context, accountID string) (*Account, error)
 		WithTransaction(context.Context, func(context.Context) error) error
 	}
@@ -74,4 +74,14 @@ func (a *Account) GetBalance() float64 {
 
 func (a *Account) Deposit(amount float64) {
 	a.balance += amount
+}
+
+func (a *Account) Withdraw(amount float64) error {
+	if a.balance < amount {
+		return ErrInsufficientBalance
+	}
+
+	a.balance -= amount
+
+	return nil
 }

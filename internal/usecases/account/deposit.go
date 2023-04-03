@@ -9,9 +9,15 @@ func (c *usecase) Deposit(ctx context.Context, accountID string, amount float64)
 	defer cancel()
 
 	err := c.repository.WithTransaction(ctx, func(ctxTx context.Context) error {
-		err := c.repository.Deposit(ctxTx, accountID, amount)
+		account, err := c.repository.FindByID(ctxTx, accountID)
 
 		if err != nil {
+			return err
+		}
+
+		account.Deposit(amount)
+
+		if err := c.repository.UpdateBalance(ctxTx, account.GetId(), account.GetBalance()); err != nil {
 			return err
 		}
 

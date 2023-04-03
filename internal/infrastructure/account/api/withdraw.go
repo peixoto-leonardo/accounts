@@ -19,15 +19,20 @@ func (a *api) Withdraw(ctx context.Context, accountId string, request models.Wit
 		return response.New(http.StatusBadRequest, response.NewErrorMessage(errs))
 	}
 
-	err := a.usecase.Withdraw(ctx, accountId, request.Amount)
-
-	if err == domain.ErrAccountNotFound {
-		return response.New(http.StatusNotFound, response.NewError(err))
-	}
-
-	if err != nil {
-		return response.New(http.StatusInternalServerError, response.NewError(err))
+	if err := a.usecase.Withdraw(ctx, accountId, request.Amount); err != nil {
+		return a.handleWithdrawErrors(err)
 	}
 
 	return response.New(http.StatusNoContent, nil)
+}
+
+func (a *api) handleWithdrawErrors(err error) response.Response {
+	switch err {
+	case domain.ErrAccountNotFound:
+		return response.New(http.StatusNotFound, response.NewError(err))
+	case domain.ErrInsufficientBalance:
+		return response.New(http.StatusUnprocessableEntity, response.NewError(err))
+	default:
+		return response.New(http.StatusInternalServerError, response.NewError(err))
+	}
 }

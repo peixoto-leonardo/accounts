@@ -34,7 +34,7 @@ func (r repository) FindByID(ctx context.Context, accountID string) (*domain.Acc
 		CPF       string
 		balance   float64
 		createdAt time.Time
-		deletedAt time.Time
+		deletedAt sql.NullTime
 	)
 
 	err := tx.QueryRowContext(ctx, query, accountID).Scan(&id, &name, &CPF, &balance, &createdAt, &deletedAt)
@@ -49,7 +49,7 @@ func (r repository) FindByID(ctx context.Context, accountID string) (*domain.Acc
 			CPF,
 			balance,
 			createdAt,
-			deletedAt,
+			deletedAt.Time,
 		), err
 	}
 }
