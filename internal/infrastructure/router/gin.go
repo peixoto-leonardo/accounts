@@ -69,7 +69,7 @@ func (g *ginEngine) buildGetAccountHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		response := api.Get(c.Request.Context(), c.Param("account_id"))
 
-		c.JSON(response.StatusCode, response)
+		c.JSON(response.StatusCode, response.Data)
 	}
 }
 
