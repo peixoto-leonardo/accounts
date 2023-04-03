@@ -14,7 +14,7 @@ func (r repository) Create(ctx context.Context, account *domain.Account) (*domai
 			($1, $2, $3, $4, $5)
 	`
 
-	if err := r.db.ExecuteContext(
+	if _, err := r.db.ExecuteContext(
 		ctx,
 		query,
 		account.GetId(),

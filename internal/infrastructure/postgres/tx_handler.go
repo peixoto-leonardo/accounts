@@ -17,10 +17,7 @@ func (t txHandler) ExecuteContext(ctx context.Context, query string, args ...int
 		return Result{}, err
 	}
 
-	rows, _ := result.RowsAffected()
-
-	return Result{rows}, nil
-
+	return newResult(result), nil
 }
 
 func (t txHandler) QueryRowContext(ctx context.Context, query string, args ...interface{}) Row {

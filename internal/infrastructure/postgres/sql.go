@@ -1,6 +1,9 @@
 package postgres
 
-import "context"
+import (
+	"context"
+	"database/sql"
+)
 
 type (
 	Result struct {
@@ -8,7 +11,7 @@ type (
 	}
 
 	SQL interface {
-		ExecuteContext(context.Context, string, ...interface{}) error
+		ExecuteContext(context.Context, string, ...interface{}) (Result, error)
 		BeginTx(context.Context) (Tx, error)
 	}
 
@@ -23,3 +26,8 @@ type (
 		Scan(dest ...interface{}) error
 	}
 )
+
+func newResult(r sql.Result) Result {
+	rows, _ := r.RowsAffected()
+	return Result{rows}
+}

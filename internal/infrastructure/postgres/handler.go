@@ -9,14 +9,14 @@ type handler struct {
 	db *sql.DB
 }
 
-func (h handler) ExecuteContext(ctx context.Context, query string, args ...interface{}) error {
-	_, err := h.db.ExecContext(ctx, query, args...)
+func (h handler) ExecuteContext(ctx context.Context, query string, args ...interface{}) (Result, error) {
+	result, err := h.db.ExecContext(ctx, query, args...)
 
 	if err != nil {
-		return err
+		return Result{}, err
 	}
 
-	return nil
+	return newResult(result), nil
 }
 
 func (h handler) QueryRowContext(ctx context.Context, query string, args ...interface{}) Row {

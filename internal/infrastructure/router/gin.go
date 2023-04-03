@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/peixoto-leonardo/accounts/internal/domain"
 	ap "github.com/peixoto-leonardo/accounts/internal/infrastructure/account/api"
 	"github.com/peixoto-leonardo/accounts/internal/infrastructure/account/di"
+	"github.com/peixoto-leonardo/accounts/internal/infrastructure/account/models"
 	"github.com/peixoto-leonardo/accounts/internal/infrastructure/postgres"
 	"github.com/peixoto-leonardo/accounts/internal/infrastructure/validator"
 	"github.com/peixoto-leonardo/accounts/pkg/utils/response"
@@ -39,55 +39,51 @@ func (g *ginEngine) configHandlers() {
 func (g *ginEngine) buildCreateAccountHandler() gin.HandlerFunc {
 	api := ap.New(di.GetCreateAccountUseCase(g.db), validator.New())
 
-	return func(ctx *gin.Context) {
-		api.Create(ctx.Writer, ctx.Request)
+	return func(c *gin.Context) {
+		var request models.CreateAccountRequest
+
+		if err := c.BindJSON(request); err != nil {
+			c.JSON(http.StatusBadRequest, response.NewError(err))
+		}
+
+		response := api.Create(c.Request.Context(), request)
+
+		c.JSON(response.StatusCode, response)
 	}
 }
 
 func (g *ginEngine) buildDeleteAccountHandler() gin.HandlerFunc {
 	api := ap.New(di.GetCreateAccountUseCase(g.db), validator.New())
 
-	return func(ctx *gin.Context) {
-		if err := api.Delete(ctx.Request.Context(), ctx.Param("account_id")); err != nil {
-			response.NewError(err, http.StatusInternalServerError).Send(ctx.Writer)
-			return
-		}
+	return func(c *gin.Context) {
+		response := api.Delete(c.Request.Context(), c.Param("account_id"))
 
-		response.NewSuccess(nil, http.StatusNoContent).Send(ctx.Writer)
+		c.JSON(response.StatusCode, response.Data)
 	}
 }
 
 func (g *ginEngine) buildGetAccountHandler() gin.HandlerFunc {
 	api := ap.New(di.GetCreateAccountUseCase(g.db), validator.New())
 
-	return func(ctx *gin.Context) {
-		r, err := api.Get(ctx.Request.Context(), ctx.Param("account_id"))
+	return func(c *gin.Context) {
+		response := api.Get(c.Request.Context(), c.Param("account_id"))
 
-		if err == domain.ErrAccountNotFound {
-			response.NewError(err, http.StatusNotFound).Send(ctx.Writer)
-			return
-		}
-
-		if err != nil {
-			response.NewError(err, http.StatusInternalServerError).Send(ctx.Writer)
-			return
-		}
-
-		response.NewSuccess(r, http.StatusOK).Send(ctx.Writer)
+		c.JSON(response.StatusCode, response)
 	}
 }
 
 func (g *ginEngine) buildDepositInAccountHandler() gin.HandlerFunc {
 	api := ap.New(di.GetCreateAccountUseCase(g.db), validator.New())
 
-	return func(ctx *gin.Context) {
-		err := api.Deposit(ctx.Request.Context(), ctx.Param("account_id"), 100.0)
+	return func(c *gin.Context) {
+		var request models.DepositRequest
 
-		if err != nil {
-			response.NewError(err, http.StatusInternalServerError).Send(ctx.Writer)
-			return
+		if err := c.BindJSON(request); err != nil {
+			c.JSON(http.StatusBadRequest, response.NewError(err))
 		}
 
-		response.NewSuccess(nil, http.StatusNoContent).Send(ctx.Writer)
+		response := api.Deposit(c.Request.Context(), c.Param("account_id"), request)
+
+		c.JSON(response.StatusCode, response.Data)
 	}
 }

@@ -2,11 +2,11 @@ package api
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/peixoto-leonardo/accounts/internal/infrastructure/account/models"
 	"github.com/peixoto-leonardo/accounts/internal/infrastructure/validator"
 	usecase "github.com/peixoto-leonardo/accounts/internal/usecases/account"
+	"github.com/peixoto-leonardo/accounts/pkg/utils/response"
 )
 
 type (
@@ -16,10 +16,10 @@ type (
 	}
 
 	Interface interface {
-		Create(http.ResponseWriter, *http.Request)
-		Delete(context.Context, string) error
-		Get(context.Context, string) (models.AccountResponse, error)
-		Deposit(context.Context, string, float64) error
+		Create(context.Context, models.CreateAccountRequest) response.Response
+		Delete(context.Context, string) response.Response
+		Get(context.Context, string) response.Response
+		Deposit(context.Context, string, models.DepositRequest) response.Response
 	}
 )
 
