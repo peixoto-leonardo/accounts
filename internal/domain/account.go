@@ -18,9 +18,10 @@ type (
 		Create(context.Context, *Account) (*Account, error)
 		Delete(context.Context, string) error
 		UpdateBalance(context.Context, string, float64) error
-		FindByID(ctx context.Context, accountID string) (*Account, error)
+		FindByID(context.Context, string) (*Account, error)
 		WithTx(context.Context, func(context.Context) error) error
 		CreateTransaction(context.Context, Transaction) error
+		GetStatement(context.Context, string) ([]Transaction, error)
 	}
 
 	Account struct {
@@ -82,7 +83,7 @@ func (a *Account) Deposit(amount float64) {
 
 	a.transactions = append(
 		a.transactions,
-		newDeposit(uuid.New(), a.id, amount, time.Now()),
+		NewDeposit(uuid.New(), a.id, amount, time.Now()),
 	)
 }
 
@@ -95,7 +96,7 @@ func (a *Account) Withdraw(amount float64) error {
 
 	a.transactions = append(
 		a.transactions,
-		newWithdraw(uuid.New(), a.id, amount, time.Now()),
+		NewWithdraw(uuid.New(), a.id, amount, time.Now()),
 	)
 
 	return nil

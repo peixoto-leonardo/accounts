@@ -22,3 +22,16 @@ func (a *api) Get(ctx context.Context, accountId string) response.Response {
 
 	return response.New(http.StatusOK, models.AccountResponse(output))
 }
+
+func (a *api) GetStatement(ctx context.Context, accountId string) response.Response {
+	output, err := a.usecase.GetStatement(ctx, accountId)
+
+	if err != nil {
+		return response.New(http.StatusInternalServerError, response.NewError(err))
+	}
+
+	return response.New(
+		http.StatusOK,
+		models.StatementResponse{Transactions: output},
+	)
+}

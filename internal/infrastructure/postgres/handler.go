@@ -25,6 +25,17 @@ func (h handler) QueryRowContext(ctx context.Context, query string, args ...inte
 	return newRowHandler(row)
 }
 
+func (p handler) QueryContext(ctx context.Context, query string, args ...interface{}) (Rows, error) {
+	rows, err := p.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	row := newRowsHandler(rows)
+
+	return row, nil
+}
+
 func (h handler) BeginTx(ctx context.Context) (Tx, error) {
 	tx, err := h.db.BeginTx(ctx, &sql.TxOptions{})
 

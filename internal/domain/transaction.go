@@ -9,6 +9,14 @@ const (
 	Withdraw
 )
 
+func (t TransactionType) String() string {
+	if t == Deposit {
+		return "Deposit"
+	}
+
+	return "Withdraw"
+}
+
 type (
 	Transaction struct {
 		id              string
@@ -19,16 +27,16 @@ type (
 	}
 )
 
-func newTransaction(id, accountId string, amount float64, transactionType TransactionType, createdAt time.Time) Transaction {
+func NewTransaction(id, accountId string, amount float64, transactionType TransactionType, createdAt time.Time) Transaction {
 	return Transaction{id, accountId, amount, transactionType, createdAt}
 }
 
-func newDeposit(id, accountId string, amount float64, createdAt time.Time) Transaction {
-	return newTransaction(id, accountId, amount, Deposit, createdAt)
+func NewDeposit(id, accountId string, amount float64, createdAt time.Time) Transaction {
+	return NewTransaction(id, accountId, amount, Deposit, createdAt)
 }
 
-func newWithdraw(id, accountId string, amount float64, createdAt time.Time) Transaction {
-	return newTransaction(id, accountId, amount, Withdraw, createdAt)
+func NewWithdraw(id, accountId string, amount float64, createdAt time.Time) Transaction {
+	return NewTransaction(id, accountId, amount, Withdraw, createdAt)
 }
 
 func (t *Transaction) GetId() string {

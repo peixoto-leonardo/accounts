@@ -30,11 +30,15 @@ func (g *ginEngine) GetHandler() http.Handler {
 }
 
 func (g *ginEngine) configHandlers() {
-	g.router.POST("/v1/accounts", g.buildCreateAccountHandler())
-	g.router.DELETE("/v1/accounts/:account_id", g.buildDeleteAccountHandler())
-	g.router.GET("/v1/accounts/:account_id", g.buildGetAccountHandler())
-	g.router.PATCH("/v1/accounts/:account_id/deposit", g.buildDepositInAccountHandler())
-	g.router.PATCH("/v1/accounts/:account_id/withdraw", g.buildWithdrawInAccountHandler())
+	accounts := g.router.Group("/v1/accounts")
+	{
+		accounts.POST("", g.buildCreateAccountHandler())
+		accounts.DELETE("/:account_id", g.buildDeleteAccountHandler())
+		accounts.GET("/:account_id", g.buildGetAccountHandler())
+		accounts.GET("/:account_id/statement", g.buildGetAccountStatementHandler())
+		accounts.PATCH("/:account_id/deposit", g.buildDepositInAccountHandler())
+		accounts.PATCH("/:account_id/withdraw", g.buildWithdrawInAccountHandler())
+	}
 }
 
 func (g *ginEngine) buildCreateAccountHandler() gin.HandlerFunc {
@@ -68,6 +72,16 @@ func (g *ginEngine) buildGetAccountHandler() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		response := api.Get(c.Request.Context(), c.Param("account_id"))
+
+		c.JSON(response.StatusCode, response.Data)
+	}
+}
+
+func (g *ginEngine) buildGetAccountStatementHandler() gin.HandlerFunc {
+	api := ap.New(di.GetCreateAccountUseCase(g.db), validator.New())
+
+	return func(c *gin.Context) {
+		response := api.GetStatement(c.Request.Context(), c.Param("account_id"))
 
 		c.JSON(response.StatusCode, response.Data)
 	}

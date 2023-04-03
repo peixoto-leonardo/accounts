@@ -25,10 +25,17 @@ type (
 		CreatedAt string
 	}
 
+	TransactionOutput struct {
+		Amount          float64   `json:"amount"`
+		TransactionType string    `json:"type"`
+		CreateAt        time.Time `json:"create_at"`
+	}
+
 	AccountUseCase interface {
 		Create(context.Context, CreateAccountInput) (CreateAccountOutput, error)
 		Delete(context.Context, string) error
 		Get(context.Context, string) (AccountOutput, error)
+		GetStatement(context.Context, string) ([]TransactionOutput, error)
 		Deposit(context.Context, string, float64) error
 		Withdraw(context.Context, string, float64) error
 	}

@@ -32,3 +32,7 @@ func newTxHandler(tx *sql.Tx) Tx {
 func newRowHandler(row *sql.Row) Row {
 	return &rowHandler{row}
 }
+
+func newRowsHandler(rows *sql.Rows) Rows {
+	return &rowsHandler{rows}
+}

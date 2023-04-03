@@ -12,6 +12,7 @@ type (
 
 	SQL interface {
 		ExecuteContext(context.Context, string, ...interface{}) (Result, error)
+		QueryContext(ctx context.Context, query string, args ...interface{}) (Rows, error)
 		BeginTx(context.Context) (Tx, error)
 	}
 
@@ -24,6 +25,13 @@ type (
 
 	Row interface {
 		Scan(dest ...interface{}) error
+	}
+
+	Rows interface {
+		Scan(dest ...interface{}) error
+		Next() bool
+		Error() error
+		Close() error
 	}
 )
 

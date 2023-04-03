@@ -19,6 +19,7 @@ type (
 		Create(context.Context, models.CreateAccountRequest) response.Response
 		Delete(context.Context, string) response.Response
 		Get(context.Context, string) response.Response
+		GetStatement(context.Context, string) response.Response
 		Deposit(context.Context, string, models.DepositRequest) response.Response
 		Withdraw(context.Context, string, models.WithdrawRequest) response.Response
 	}
