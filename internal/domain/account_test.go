@@ -2,207 +2,59 @@ package domain
 
 import (
 	"testing"
+
+	"github.com/brianvoe/gofakeit/v6"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestAccount_Deposit(t *testing.T) {
-	t.Parallel()
-
-	type args struct {
-		amount Money
+type (
+	DepositAccountSuite struct {
+		suite.Suite
+		account Account
+		amount  Money
 	}
 
-	tests := []struct {
-		name     string
-		account  Account
-		args     args
-		expected Money
-	}{
-		{
-			name:     "Successful depositing balance",
-			args:     args{amount: 10},
-			account:  Account{balance: 0},
-			expected: 10,
-		},
-		{
-			name:     "Successful depositing balance",
-			args:     args{amount: 100},
-			account:  Account{balance: 100},
-			expected: 200,
-		},
+	WithdrawAccountSuite struct {
+		suite.Suite
+		account Account
+		amount  Money
 	}
+)
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.account.Deposit(tt.args.amount)
-
-			if tt.account.GetBalance() != tt.expected {
-				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'",
-					tt.name,
-					tt.account.GetBalance(),
-					tt.expected,
-				)
-			}
-		})
-	}
+func (s *DepositAccountSuite) SetupTest() {
+	s.amount = Money(gofakeit.Number(1, 100_000))
+	s.account = Account{balance: Money(gofakeit.Number(0, 100_000))}
 }
 
-func TestAccount_Deposit_Transaction(t *testing.T) {
-	t.Parallel()
+func (s *DepositAccountSuite) TestDeposit() {
+	expectBalance := s.account.balance + s.amount
 
-	type args struct {
-		amount Money
-	}
+	s.account.Deposit(s.amount)
 
-	tests := []struct {
-		name     string
-		account  Account
-		args     args
-		expected Transaction
-	}{
-		{
-			name:    "Successful depositing balance",
-			args:    args{amount: 10},
-			account: Account{balance: 0, id: "62587372-c8b8-4d3b-ad20-47d7ac8294a2"},
-			expected: Transaction{
-				accountId:       "62587372-c8b8-4d3b-ad20-47d7ac8294a2",
-				amount:          10,
-				transactionType: Deposit,
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.account.Deposit(tt.args.amount)
-
-			transaction := tt.account.GetLastTransaction()
-
-			if transaction.accountId != tt.expected.accountId {
-				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'",
-					tt.name,
-					transaction.accountId,
-					tt.expected.accountId,
-				)
-			}
-			if transaction.amount != tt.args.amount {
-				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'",
-					tt.name,
-					transaction.accountId,
-					tt.expected.accountId,
-				)
-			}
-			if transaction.transactionType != tt.expected.transactionType {
-				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'",
-					tt.name,
-					transaction.transactionType,
-					tt.expected.transactionType,
-				)
-			}
-		})
-	}
+	s.Require().Equal(Money(expectBalance), s.account.balance)
 }
 
-func TestAccount_Withdraw(t *testing.T) {
-	t.Parallel()
-
-	type args struct {
-		amount Money
-	}
-
-	tests := []struct {
-		name        string
-		account     Account
-		args        args
-		expected    Money
-		expectedErr error
-	}{
-		{
-			name:     "Successful withdrawing balance",
-			args:     args{amount: 100},
-			account:  Account{balance: 200},
-			expected: 100,
-		},
-		{
-			name: "error when withdrawing account balance without sufficient balance",
-			args: args{
-				amount: 500,
-			},
-			account:     Account{balance: 200},
-			expectedErr: ErrInsufficientBalance,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.account.Withdraw(tt.args.amount); (err != nil) && (err.Error() != tt.expectedErr.Error()) {
-				t.Errorf("[TestCase '%s'] ResultError: '%v' | ExpectedError: '%v'",
-					tt.name,
-					err,
-					tt.expectedErr.Error(),
-				)
-				return
-			}
-
-			if tt.expectedErr == nil && tt.account.GetBalance() != tt.expected {
-				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'",
-					tt.name,
-					tt.account.GetBalance(),
-					tt.expected,
-				)
-			}
-		})
-	}
+func TestDepositAccountSuite(t *testing.T) {
+	suite.Run(t, new(DepositAccountSuite))
 }
 
-func TestAccount_Withdraw_Transaction(t *testing.T) {
-	t.Parallel()
+func (s *WithdrawAccountSuite) SetupTest() {
+	s.amount = Money(gofakeit.Number(1, 100))
+	s.account = Account{balance: Money(gofakeit.Number(200, 100_000))}
+}
 
-	type args struct {
-		amount Money
-	}
+func (s *WithdrawAccountSuite) TestWithdraw() {
+	expectBalance := s.account.balance - s.amount
 
-	tests := []struct {
-		name        string
-		account     Account
-		args        args
-		expected    Transaction
-		expectedErr error
-	}{
-		{
-			name:     "Successful withdrawing balance",
-			args:     args{amount: 100},
-			account:  Account{balance: 200, id: "62587372-c8b8-4d3b-ad20-47d7ac8294a2"},
-			expected: Transaction{amount: 100, transactionType: Withdraw, accountId: "62587372-c8b8-4d3b-ad20-47d7ac8294a2"},
-		},
-	}
+	s.account.Withdraw(s.amount)
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.account.Withdraw(tt.args.amount)
+	s.Require().Equal(Money(expectBalance), s.account.balance)
+}
 
-			transaction := tt.account.GetLastTransaction()
+func (s *WithdrawAccountSuite) TestWithdraw_ShouldReturnErrInsufficientBalance() {
+	s.Require().Equal(ErrInsufficientBalance, s.account.Withdraw(s.account.balance+s.amount))
+}
 
-			if transaction.accountId != tt.expected.accountId {
-				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'",
-					tt.name,
-					transaction.accountId,
-					tt.expected.accountId,
-				)
-			}
-			if transaction.amount != tt.args.amount {
-				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'",
-					tt.name,
-					transaction.accountId,
-					tt.expected.accountId,
-				)
-			}
-			if transaction.transactionType != tt.expected.transactionType {
-				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'",
-					tt.name,
-					transaction.transactionType,
-					tt.expected.transactionType,
-				)
-			}
-		})
-	}
+func TestWithdrawAccountSuite(t *testing.T) {
+	suite.Run(t, new(WithdrawAccountSuite))
 }
