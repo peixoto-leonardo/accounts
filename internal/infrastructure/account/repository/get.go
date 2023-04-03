@@ -23,7 +23,7 @@ func (r repository) FindByID(ctx context.Context, accountID string) (*domain.Acc
 	var (
 		query = `
 			SELECT 
-				*
+				id, name, cpf, balance, created_at, deleted_at
 			FROM 
 				accounts
 			WHERE

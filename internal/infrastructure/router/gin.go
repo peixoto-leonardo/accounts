@@ -49,7 +49,7 @@ func (g *ginEngine) buildCreateAccountHandler() gin.HandlerFunc {
 
 		response := api.Create(c.Request.Context(), request)
 
-		c.JSON(response.StatusCode, response)
+		c.JSON(response.StatusCode, response.Data)
 	}
 }
 

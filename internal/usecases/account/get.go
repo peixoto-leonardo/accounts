@@ -14,7 +14,7 @@ func (c *usecase) Get(ctx context.Context, accountID string) (AccountOutput, err
 		account *domain.Account
 		err     error
 	)
-	err = c.repository.WithTransaction(ctx, func(ctxTx context.Context) error {
+	err = c.repository.WithTx(ctx, func(ctxTx context.Context) error {
 		account, err = c.repository.FindByID(ctxTx, accountID)
 
 		if err != nil {

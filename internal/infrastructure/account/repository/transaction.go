@@ -3,26 +3,49 @@ package repository
 import (
 	"context"
 
+	"github.com/peixoto-leonardo/accounts/internal/domain"
+	"github.com/peixoto-leonardo/accounts/internal/infrastructure/postgres"
 	"github.com/pkg/errors"
 )
 
-func (r repository) WithTransaction(ctx context.Context, fn func(ctxTx context.Context) error) error {
-	tx, err := r.db.BeginTx(ctx)
+func (r repository) CreateTransaction(ctx context.Context, transaction domain.Transaction) error {
+	tx, ok := ctx.Value("TransactionContextKey").(postgres.Tx)
 
-	if err != nil {
-		return errors.Wrap(err, "error begin tx")
-	}
+	if !ok {
+		var err error
+		tx, err = r.db.BeginTx(ctx)
 
-	ctxTx := context.WithValue(ctx, "TransactionContextKey", tx)
-
-	err = fn(ctxTx)
-
-	if err != nil {
-		if rbErr := tx.Rollback(); rbErr != nil {
-			return errors.Wrap(err, "rollback error")
+		if err != nil {
+			return errors.Wrap(err, "error on insert transaction")
 		}
-		return err
 	}
 
-	return tx.Commit()
+	var query = `
+		INSERT INTO
+			transactions(id, account_id, amount, type, created_at)
+		VALUES
+			($1, $2, $3, $4, $5)
+	`
+
+	if _, err := tx.ExecuteContext(
+		ctx,
+		query,
+		transaction.GetId(),
+		transaction.GetAccountId(),
+		transaction.GetAmount(),
+		mapTransactionType(transaction.GetType()),
+		transaction.GetCreatedAt(),
+	); err != nil {
+		return errors.Wrap(err, "error creating transaction")
+	}
+
+	return nil
+}
+
+func mapTransactionType(transactionType domain.TransactionType) string {
+	if transactionType == domain.Withdraw {
+		return "WITHDRAW"
+	}
+
+	return "DEPOSIT"
 }

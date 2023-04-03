@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"time"
+
+	"github.com/peixoto-leonardo/accounts/pkg/utils/uuid"
 )
 
 var (
@@ -17,16 +19,18 @@ type (
 		Delete(context.Context, string) error
 		UpdateBalance(context.Context, string, float64) error
 		FindByID(ctx context.Context, accountID string) (*Account, error)
-		WithTransaction(context.Context, func(context.Context) error) error
+		WithTx(context.Context, func(context.Context) error) error
+		CreateTransaction(context.Context, Transaction) error
 	}
 
 	Account struct {
-		id        string
-		name      string
-		cpf       string
-		balance   float64
-		deletedAt time.Time
-		createdAt time.Time
+		id           string
+		name         string
+		cpf          string
+		balance      float64
+		transactions []Transaction
+		deletedAt    time.Time
+		createdAt    time.Time
 	}
 )
 
@@ -39,12 +43,13 @@ func NewAccount(
 	deletedAt time.Time,
 ) *Account {
 	return &Account{
-		id,
-		name,
-		cpf,
-		balance,
-		deletedAt,
-		createdAt,
+		id:           id,
+		name:         name,
+		cpf:          cpf,
+		balance:      balance,
+		transactions: nil,
+		deletedAt:    deletedAt,
+		createdAt:    createdAt,
 	}
 }
 
@@ -74,6 +79,11 @@ func (a *Account) GetBalance() float64 {
 
 func (a *Account) Deposit(amount float64) {
 	a.balance += amount
+
+	a.transactions = append(
+		a.transactions,
+		newDeposit(uuid.New(), a.id, amount, time.Now()),
+	)
 }
 
 func (a *Account) Withdraw(amount float64) error {
@@ -83,5 +93,14 @@ func (a *Account) Withdraw(amount float64) error {
 
 	a.balance -= amount
 
+	a.transactions = append(
+		a.transactions,
+		newWithdraw(uuid.New(), a.id, amount, time.Now()),
+	)
+
 	return nil
+}
+
+func (a *Account) GetLastTransaction() Transaction {
+	return a.transactions[len(a.transactions)-1]
 }
