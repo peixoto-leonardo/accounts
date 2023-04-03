@@ -19,7 +19,7 @@ func (a *api) Deposit(ctx context.Context, accountId string, request models.Depo
 		return response.New(http.StatusBadRequest, response.NewErrorMessage(errs))
 	}
 
-	err := a.usecase.Deposit(ctx, accountId, request.Amount)
+	err := a.usecase.Deposit(ctx, accountId, domain.FloatToMoney(request.Amount))
 
 	if err == domain.ErrAccountNotFound {
 		return response.New(http.StatusNotFound, response.NewError(err))

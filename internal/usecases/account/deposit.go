@@ -2,9 +2,11 @@ package account
 
 import (
 	"context"
+
+	"github.com/peixoto-leonardo/accounts/internal/domain"
 )
 
-func (c *usecase) Deposit(ctx context.Context, accountID string, amount float64) error {
+func (c *usecase) Deposit(ctx context.Context, accountID string, amount domain.Money) error {
 	ctx, cancel := context.WithTimeout(ctx, c.contextTimeout)
 	defer cancel()
 

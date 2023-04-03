@@ -17,7 +17,7 @@ type (
 	AccountRepository interface {
 		Create(context.Context, *Account) (*Account, error)
 		Delete(context.Context, string) error
-		UpdateBalance(context.Context, string, float64) error
+		UpdateBalance(context.Context, string, Money) error
 		FindByID(context.Context, string) (*Account, error)
 		WithTx(context.Context, func(context.Context) error) error
 		CreateTransaction(context.Context, Transaction) error
@@ -28,7 +28,7 @@ type (
 		id           string
 		name         string
 		cpf          string
-		balance      float64
+		balance      Money
 		transactions []Transaction
 		deletedAt    time.Time
 		createdAt    time.Time
@@ -39,7 +39,7 @@ func NewAccount(
 	id string,
 	name string,
 	cpf string,
-	balance float64,
+	balance Money,
 	createdAt time.Time,
 	deletedAt time.Time,
 ) *Account {
@@ -74,11 +74,11 @@ func (a *Account) GetCreatedAt() time.Time {
 	return a.createdAt
 }
 
-func (a *Account) GetBalance() float64 {
+func (a *Account) GetBalance() Money {
 	return a.balance
 }
 
-func (a *Account) Deposit(amount float64) {
+func (a *Account) Deposit(amount Money) {
 	a.balance += amount
 
 	a.transactions = append(
@@ -87,7 +87,7 @@ func (a *Account) Deposit(amount float64) {
 	)
 }
 
-func (a *Account) Withdraw(amount float64) error {
+func (a *Account) Withdraw(amount Money) error {
 	if a.balance < amount {
 		return ErrInsufficientBalance
 	}

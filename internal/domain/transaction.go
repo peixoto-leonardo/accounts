@@ -21,21 +21,21 @@ type (
 	Transaction struct {
 		id              string
 		accountId       string
-		amount          float64
+		amount          Money
 		transactionType TransactionType
 		createdAt       time.Time
 	}
 )
 
-func NewTransaction(id, accountId string, amount float64, transactionType TransactionType, createdAt time.Time) Transaction {
+func NewTransaction(id, accountId string, amount Money, transactionType TransactionType, createdAt time.Time) Transaction {
 	return Transaction{id, accountId, amount, transactionType, createdAt}
 }
 
-func NewDeposit(id, accountId string, amount float64, createdAt time.Time) Transaction {
+func NewDeposit(id, accountId string, amount Money, createdAt time.Time) Transaction {
 	return NewTransaction(id, accountId, amount, Deposit, createdAt)
 }
 
-func NewWithdraw(id, accountId string, amount float64, createdAt time.Time) Transaction {
+func NewWithdraw(id, accountId string, amount Money, createdAt time.Time) Transaction {
 	return NewTransaction(id, accountId, amount, Withdraw, createdAt)
 }
 
@@ -47,7 +47,7 @@ func (t *Transaction) GetAccountId() string {
 	return t.accountId
 }
 
-func (t *Transaction) GetAmount() float64 {
+func (t *Transaction) GetAmount() Money {
 	return t.amount
 }
 

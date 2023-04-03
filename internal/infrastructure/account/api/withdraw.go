@@ -19,7 +19,7 @@ func (a *api) Withdraw(ctx context.Context, accountId string, request models.Wit
 		return response.New(http.StatusBadRequest, response.NewErrorMessage(errs))
 	}
 
-	if err := a.usecase.Withdraw(ctx, accountId, request.Amount); err != nil {
+	if err := a.usecase.Withdraw(ctx, accountId, domain.FloatToMoney(request.Amount)); err != nil {
 		return a.handleWithdrawErrors(err)
 	}
 

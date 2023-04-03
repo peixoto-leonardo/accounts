@@ -32,7 +32,7 @@ func (r repository) FindByID(ctx context.Context, accountID string) (*domain.Acc
 		id        string
 		name      string
 		CPF       string
-		balance   float64
+		balance   int64
 		createdAt time.Time
 		deletedAt sql.NullTime
 	)
@@ -47,7 +47,7 @@ func (r repository) FindByID(ctx context.Context, accountID string) (*domain.Acc
 			accountID,
 			name,
 			CPF,
-			balance,
+			domain.Money(balance),
 			createdAt,
 			deletedAt.Time,
 		), err
@@ -75,7 +75,7 @@ func (r repository) GetStatement(ctx context.Context, accountId string) ([]domai
 		var (
 			id              string
 			createdAt       time.Time
-			amount          float64
+			amount          int64
 			typeTransaction string
 		)
 
@@ -84,9 +84,9 @@ func (r repository) GetStatement(ctx context.Context, accountId string) ([]domai
 		}
 
 		if typeTransaction == "WITHDRAW" {
-			transactions = append(transactions, domain.NewWithdraw(id, accountId, amount, createdAt))
+			transactions = append(transactions, domain.NewWithdraw(id, accountId, domain.Money(amount), createdAt))
 		} else {
-			transactions = append(transactions, domain.NewDeposit(id, accountId, amount, createdAt))
+			transactions = append(transactions, domain.NewDeposit(id, accountId, domain.Money(amount), createdAt))
 		}
 	}
 

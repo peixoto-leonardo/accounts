@@ -32,7 +32,7 @@ func (c *usecase) Get(ctx context.Context, accountID string) (AccountOutput, err
 		Id:        account.GetId(),
 		Name:      account.GetName(),
 		CPF:       account.GetCpf(),
-		Balance:   account.GetBalance(),
+		Balance:   account.GetBalance().Float64(),
 		CreatedAt: account.GetCreatedAt().Format("2006-01-02"),
 	}, nil
 }
@@ -51,9 +51,9 @@ func (c *usecase) GetStatement(ctx context.Context, accountID string) ([]Transac
 
 	for _, transaction := range transactions {
 		output = append(output, TransactionOutput{
-			Amount:          transaction.GetAmount(),
 			CreateAt:        transaction.GetCreatedAt(),
 			TransactionType: transaction.GetType().String(),
+			Amount:          transaction.GetAmount().Float64(),
 		})
 	}
 

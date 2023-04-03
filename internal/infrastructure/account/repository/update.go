@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (r repository) UpdateBalance(ctx context.Context, accountId string, balance float64) error {
+func (r repository) UpdateBalance(ctx context.Context, accountId string, balance domain.Money) error {
 	tx, ok := ctx.Value("TransactionContextKey").(postgres.Tx)
 
 	if !ok {

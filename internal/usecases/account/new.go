@@ -36,8 +36,8 @@ type (
 		Delete(context.Context, string) error
 		Get(context.Context, string) (AccountOutput, error)
 		GetStatement(context.Context, string) ([]TransactionOutput, error)
-		Deposit(context.Context, string, float64) error
-		Withdraw(context.Context, string, float64) error
+		Deposit(context.Context, string, domain.Money) error
+		Withdraw(context.Context, string, domain.Money) error
 	}
 
 	usecase struct {
