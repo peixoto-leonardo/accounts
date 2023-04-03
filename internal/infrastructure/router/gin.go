@@ -43,7 +43,7 @@ func (g *ginEngine) buildCreateAccountHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var request models.CreateAccountRequest
 
-		if err := c.BindJSON(request); err != nil {
+		if err := c.BindJSON(&request); err != nil {
 			c.JSON(http.StatusBadRequest, response.NewError(err))
 		}
 
@@ -79,7 +79,7 @@ func (g *ginEngine) buildDepositInAccountHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var request models.DepositRequest
 
-		if err := c.BindJSON(request); err != nil {
+		if err := c.BindJSON(&request); err != nil {
 			c.JSON(http.StatusBadRequest, response.NewError(err))
 		}
 
@@ -95,7 +95,7 @@ func (g *ginEngine) buildWithdrawInAccountHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var request models.WithdrawRequest
 
-		if err := c.BindJSON(request); err != nil {
+		if err := c.BindJSON(&request); err != nil {
 			c.JSON(http.StatusBadRequest, response.NewError(err))
 		}
 
