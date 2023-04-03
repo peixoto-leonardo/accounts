@@ -33,7 +33,8 @@ func (g *ginEngine) configHandlers() {
 	g.router.POST("/v1/accounts", g.buildCreateAccountHandler())
 	g.router.DELETE("/v1/accounts/:account_id", g.buildDeleteAccountHandler())
 	g.router.GET("/v1/accounts/:account_id", g.buildGetAccountHandler())
-	g.router.PATCH("/v1/accounts/:account_id", g.buildDepositInAccountHandler())
+	g.router.PATCH("/v1/accounts/:account_id/deposit", g.buildDepositInAccountHandler())
+	g.router.PATCH("/v1/accounts/:account_id/withdraw", g.buildWithdrawInAccountHandler())
 }
 
 func (g *ginEngine) buildCreateAccountHandler() gin.HandlerFunc {
@@ -83,6 +84,22 @@ func (g *ginEngine) buildDepositInAccountHandler() gin.HandlerFunc {
 		}
 
 		response := api.Deposit(c.Request.Context(), c.Param("account_id"), request)
+
+		c.JSON(response.StatusCode, response.Data)
+	}
+}
+
+func (g *ginEngine) buildWithdrawInAccountHandler() gin.HandlerFunc {
+	api := ap.New(di.GetCreateAccountUseCase(g.db), validator.New())
+
+	return func(c *gin.Context) {
+		var request models.WithdrawRequest
+
+		if err := c.BindJSON(request); err != nil {
+			c.JSON(http.StatusBadRequest, response.NewError(err))
+		}
+
+		response := api.Withdraw(c.Request.Context(), c.Param("account_id"), request)
 
 		c.JSON(response.StatusCode, response.Data)
 	}

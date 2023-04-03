@@ -30,6 +30,7 @@ type (
 		Delete(context.Context, string) error
 		Get(context.Context, string) (AccountOutput, error)
 		Deposit(context.Context, string, float64) error
+		Withdraw(context.Context, string, float64) error
 	}
 
 	usecase struct {

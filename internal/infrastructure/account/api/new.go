@@ -20,6 +20,7 @@ type (
 		Delete(context.Context, string) response.Response
 		Get(context.Context, string) response.Response
 		Deposit(context.Context, string, models.DepositRequest) response.Response
+		Withdraw(context.Context, string, models.WithdrawRequest) response.Response
 	}
 )
 

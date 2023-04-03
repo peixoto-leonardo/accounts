@@ -15,6 +15,7 @@ type (
 		Create(context.Context, *Account) (*Account, error)
 		Delete(context.Context, string) error
 		Deposit(context.Context, string, float64) error
+		Withdraw(context.Context, string, float64) error
 		FindByID(ctx context.Context, accountID string) (*Account, error)
 		WithTransaction(context.Context, func(context.Context) error) error
 	}
