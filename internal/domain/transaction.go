@@ -9,12 +9,13 @@ const (
 	Withdraw
 )
 
-func (t TransactionType) String() string {
-	if t == Deposit {
-		return "Deposit"
-	}
+var TransactionTypeDescription = [...]string{
+	Deposit:  "Deposit",
+	Withdraw: "Withdraw",
+}
 
-	return "Withdraw"
+func (t TransactionType) String() string {
+	return TransactionTypeDescription[t]
 }
 
 type (

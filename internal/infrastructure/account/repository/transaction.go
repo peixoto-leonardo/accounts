@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"strings"
 
 	"github.com/peixoto-leonardo/accounts/internal/domain"
 	"github.com/peixoto-leonardo/accounts/internal/infrastructure/postgres"
@@ -33,19 +34,11 @@ func (r repository) CreateTransaction(ctx context.Context, transaction domain.Tr
 		transaction.GetId(),
 		transaction.GetAccountId(),
 		transaction.GetAmount(),
-		mapTransactionType(transaction.GetType()),
+		strings.ToUpper(transaction.GetType().String()),
 		transaction.GetCreatedAt(),
 	); err != nil {
 		return errors.Wrap(err, "error creating transaction")
 	}
 
 	return nil
-}
-
-func mapTransactionType(transactionType domain.TransactionType) string {
-	if transactionType == domain.Withdraw {
-		return "WITHDRAW"
-	}
-
-	return "DEPOSIT"
 }
