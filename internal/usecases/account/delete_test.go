@@ -12,12 +12,11 @@ import (
 
 func TestDeleteAccount(t *testing.T) {
 	t.Run("should delete an account", func(t *testing.T) {
-		accountId := uuid.New()
 		repository := &domain.AccountRepositoryMock{}
 		repository.On("Delete").Return(nil)
 		usecase := New(time.Second, repository)
 
-		err := usecase.Delete(context.TODO(), accountId)
+		err := usecase.Delete(context.TODO(), uuid.New())
 
 		assert.NoError(t, err)
 	})
