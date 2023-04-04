@@ -1,36 +1,33 @@
 package domain
 
-import "testing"
+import (
+	"testing"
 
-func TestMoney_FloatToMoney(t *testing.T) {
-	t.Parallel()
+	"github.com/brianvoe/gofakeit/v6"
+	"github.com/stretchr/testify/suite"
+)
 
-	tests := []struct {
-		name     string
-		args     float64
-		expected Money
-	}{
-		{
-			name:     "should convert to float to money type",
-			args:     100.0,
-			expected: 10000,
-		},
-		{
-			name:     "should convert to float to money type",
-			args:     .50,
-			expected: 50,
-		},
+type (
+	MoneySuite struct {
+		suite.Suite
+		amount float64
 	}
+)
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if FloatToMoney(tt.args) != tt.expected {
-				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'",
-					tt.name,
-					FloatToMoney(tt.args),
-					tt.expected,
-				)
-			}
-		})
-	}
+func (s *MoneySuite) SetupTest() {
+	s.amount = gofakeit.Float64Range(0.0, 100_000.0)
+}
+
+func (s *MoneySuite) TestFloatToMoney() {
+	s.Require().Equal(Money(s.amount*100), FloatToMoney(s.amount))
+}
+
+func (s *MoneySuite) TestMoneyToFloat64() {
+	expected := float64(Money(s.amount*100)) / 100
+
+	s.Require().Equal(expected, FloatToMoney(s.amount).Float64())
+}
+
+func TestMoneySuite(t *testing.T) {
+	suite.Run(t, new(MoneySuite))
 }
