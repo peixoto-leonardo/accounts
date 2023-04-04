@@ -31,9 +31,12 @@ func (m *AccountRepositoryMock) FindByID(_ context.Context, _ string) (*Account,
 	return args.Get(0).(*Account), mockUtils.ReturnNilOrError(args, 1)
 }
 
-func (m *AccountRepositoryMock) WithTx(_ context.Context, _ func(context.Context) error) error {
-	args := m.MethodCalled("WithTx")
-	return mockUtils.ReturnNilOrError(args, 0)
+func (m *AccountRepositoryMock) WithTx(_ context.Context, fn func(context.Context) error) error {
+	if err := fn(context.Background()); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (m *AccountRepositoryMock) CreateTransaction(_ context.Context, _ Transaction) error {
